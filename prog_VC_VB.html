@@ -1,0 +1,649 @@
+<html>
+<head>
+<title>ProgramsHy(VC_VB)</title>
+<link rel="icon" href="../drow.jpg" type="image/png">
+<meta charset="utf-8">
+
+<nav>
+<ul>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/home.html">HOME</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/profile.html">PROFILE</a></li>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/crew.html">CREW</a></li>
+    <li ><a href="http://johnfranz.blogspot.com/" target="_blank">BLOG</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/team.html">TEAM</a>
+    <ul>
+                <li><a href="#">CpE_Wiz</a></li>
+                 <li><a href="#">chx_gaming</a></li>      
+                  </ul>
+                </li>
+    <li><a href="#">PROJECTS</a>
+    <ul>
+                <li><a href="#">tafficlight</a>
+                <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_traf_image.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">voicecommandCalculator</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_VC_img.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_dora_img.html">images</a></li>
+                    </ul>
+               </li>
+      </ul>
+     </li>
+     
+     <li><a href="#">PROGRAMS</a>
+          <ul>
+                <li><a href="#">TL</a>
+                       <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_TL_ard.html">arduino</a></li>
+                    
+                    </ul>
+                </li>
+                <li><a href="#">VC</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_arduino.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_ard.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                </ul>
+      </li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/comment.html">COMMENTS</a></li>
+  </ul>
+  </nav>
+  </head>
+<body background="../dota_earth.png">
+<br>
+<div class="container container-text">
+<section>"An interactive calculator that can be used by blind. But for me its fun to used and cool :D"</section>
+<aside>
+  <textarea name="textarea" style="width:650px;height:1200px;">
+    Imports System.IO
+Imports System.IO.Ports
+Imports System.Threading
+Imports System.Speech.Synthesis
+Imports System.Speech.Recognition
+Imports System.Speech.Recognition.Grammar
+Imports System.Threading.Tasks
+Imports System.Text
+Imports System.Speech
+Imports SpeechLib
+Public Class Form1
+    Dim display = 0
+    Dim FirstNumber
+    Dim strOperation = 0
+    Shared _continue As Boolean
+    Shared _serialPort As SerialPort
+    Dim SpeechSynthesizer As New SpeechSynthesizer
+    Dim pBuilder As New PromptBuilder
+    Dim srecognize As New SpeechRecognitionEngine
+    Private WithEvents objRecoContext As SpeechLib.SpSharedRecoContext = Nothing
+    Private grammar As SpeechLib.ISpeechRecoGrammar = Nothing
+    Private menuRule As SpeechLib.ISpeechGrammarRule = Nothing
+    Private SpFlags As SpeechVoiceSpeakFlags = SpeechVoiceSpeakFlags.SVSFlagsAsync
+    Private Voice As New SpVoice()
+    Private systemActive As Boolean
+    Private Sub enableVoiceCommand()
+        ' Get an instance of RecoContext. 
+        objRecoContext = New SpeechLib.SpSharedRecoContext()
+        ' Assign an eventhandler for the Hypothesis Event.
+        '   objRecoContext.Hypothesis += new _ISpeechRecoContextEvents_HypothesisEventHandler(Hypo_Event);
+        ' Assign an eventhandler for the Recognition Event.
+        ' AddHandler objRecoContext.Recognition, AddressOf Reco_Event
+        'Creating an instance of the grammer object.
+        grammar = objRecoContext.CreateGrammar(0)
+        'Activate the Menu Commands.      
+        menuRule = grammar.Rules.Add("MenuCommands", SpeechRuleAttributes.SRATopLevel Or SpeechRuleAttributes.SRADynamic, 1)
+        Dim PropValue As Object = ""
+        ' instantiate switch on
+        menuRule.InitialState.AddWordTransition(Nothing, "Calculator", " ", SpeechGrammarWordType.SGLexical, "Calculator", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "one", " ", SpeechGrammarWordType.SGLexical, "one", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "two", " ", SpeechGrammarWordType.SGLexical, "two", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "three", " ", SpeechGrammarWordType.SGLexical, "three", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "four", " ", SpeechGrammarWordType.SGLexical, "four", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "five", " ", SpeechGrammarWordType.SGLexical, "five", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "six", " ", SpeechGrammarWordType.SGLexical, "six", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "seven", " ", SpeechGrammarWordType.SGLexical, "seven", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "eight", " ", SpeechGrammarWordType.SGLexical, "eight", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "nine", " ", SpeechGrammarWordType.SGLexical, "nine", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "zero", " ", SpeechGrammarWordType.SGLexical, "zero", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "plus", " ", SpeechGrammarWordType.SGLexical, "plus", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "minus", " ", SpeechGrammarWordType.SGLexical, "minus", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "multiply", " ", SpeechGrammarWordType.SGLexical, "multiply", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "divide", " ", SpeechGrammarWordType.SGLexical, "divide", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "answer", " ", SpeechGrammarWordType.SGLexical, "answer", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "delete", " ", SpeechGrammarWordType.SGLexical, "delete", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "quit", " ", SpeechGrammarWordType.SGLexical, "quit", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "point", " ", SpeechGrammarWordType.SGLexical, "point", 1, PropValue, 1.0F)
+        ' validate phrase
+        grammar.Rules.Commit()
+        grammar.CmdSetRuleState("MenuCommands", SpeechRuleState.SGDSActive)
+    End Sub
+    Private Sub one(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "one" Then
+            TextBox1.Text = TextBox1.Text + "1"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub two(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "two" Then
+            TextBox1.Text = TextBox1.Text + "2"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub three(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "three" Then
+            TextBox1.Text = TextBox1.Text + "3"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub four(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "four" Then
+            TextBox1.Text = TextBox1.Text + "4"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub five(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "five" Then
+            TextBox1.Text = TextBox1.Text + "5"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub six(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "six" Then
+            TextBox1.Text = TextBox1.Text + "6"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub seven(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "seven" Then
+            TextBox1.Text = TextBox1.Text + "7"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub eight(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "eight" Then
+            TextBox1.Text = TextBox1.Text + "8"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub nine(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "nine" Then
+            TextBox1.Text = TextBox1.Text + "9"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub zero(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "zero" Then
+            TextBox1.Text = TextBox1.Text + "0"
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub delete(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "delete" Then
+            TextBox1.Text = String.Empty
+        End If
+    End Sub
+    Private Sub quit(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "quit" Then
+            Application.Exit()
+        End If
+    End Sub
+    Private Sub point(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        If voiceString = "point" Then
+            TextBox1.Text = TextBox1.Text + "."
+        End If
+    End Sub
+    Private Sub plus(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "plus" Then
+            plus()
+        End If
+    End Sub
+    Private Sub plus()
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        strOperation = 11
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub minus(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "minus" Then
+            minus()
+        End If
+    End Sub
+    Private Sub minus()
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        strOperation = 12
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub times(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "multiply" Then
+            times()
+        End If
+    End Sub
+    Private Sub times()
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        strOperation = 13
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub divide(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "divide" Then
+            divide()
+        End If
+    End Sub
+    Private Sub divide()
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        strOperation = 14
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub Button18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button18.Click
+        enableVoiceCommand()
+        Voice.Speak("yes master, initializing voice command activator", SpFlags)
+    End Sub
+    Private Sub ans(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If voiceString = "answer" Then
+            Select Case strOperation
+                Case "11"
+                    TextBox1.Text = Convert.ToString(Convert.ToDouble(TextBox1.Text) + FirstNumber)
+                Case "12"
+                    TextBox1.Text = Convert.ToString(FirstNumber - Convert.ToDouble(TextBox1.Text))
+                Case "13"
+                    TextBox1.Text = Convert.ToString(Convert.ToDouble(TextBox1.Text) * FirstNumber)
+                Case "14"
+                    TextBox1.Text = Convert.ToString(FirstNumber / Convert.ToDouble(TextBox1.Text))
+            End Select
+        End If
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        SerialPort1.Close()
+        SerialPort1.PortName = "com7" 'change com port to match your Arduino port
+        SerialPort1.BaudRate = 9600
+        SerialPort1.DataBits = 8
+        SerialPort1.Parity = Parity.None
+        SerialPort1.StopBits = StopBits.One
+        SerialPort1.Handshake = Handshake.None
+        SerialPort1.Encoding = System.Text.Encoding.Default 'very important!
+    End Sub
+
+    ''////////////////////////////////////////////////////////////////////////////////////////
+
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "2"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "1"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "3"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "4"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "5"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button6.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "6"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button7.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "7"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button8.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "8"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button9.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "9"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button11.Click
+        If (TextBox1.Text = "0") Then
+            TextBox1.Text = String.Empty
+        End If
+        TextBox1.Text = TextBox1.Text + "0"
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Private Sub Button10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button10.Click
+        TextBox1.Text = TextBox1.Text + "."
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+    End Sub
+    Private Sub Button17_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button17.Click
+        TextBox1.Text = "0"
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub Button16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button16.Click
+        Select Case strOperation
+            Case "1"
+                TextBox1.Text = Convert.ToString(Convert.ToDouble(TextBox1.Text) + FirstNumber)
+            Case "2"
+                TextBox1.Text = Convert.ToString(FirstNumber - Convert.ToDouble(TextBox1.Text))
+            Case "3"
+                TextBox1.Text = Convert.ToString(Convert.ToDouble(TextBox1.Text) * FirstNumber)
+            Case "4"
+                TextBox1.Text = Convert.ToString(FirstNumber / Convert.ToDouble(TextBox1.Text))
+        End Select
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        SerialPort1.Open()
+        SerialPort1.Write(TextBox1.Text)
+        SerialPort1.Close()
+    End Sub
+    Public Sub New()
+        InitializeComponent()
+    End Sub
+    Private Sub Button12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button12.Click
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        TextBox1.Text = "plus"
+        strOperation = 1
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub Button13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button13.Click
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        TextBox1.Text = "minus "
+        strOperation = 2
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub Button14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button14.Click
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        TextBox1.Text = "times"
+        strOperation = 3
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        TextBox1.Text = String.Empty
+    End Sub
+    Private Sub Button15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button15.Click
+        FirstNumber = Convert.ToDouble(TextBox1.Text)
+        TextBox1.Text = "divide"
+        strOperation = 4
+        pBuilder.ClearContent()
+        pBuilder.AppendText(TextBox1.Text)
+        SpeechSynthesizer.Speak(pBuilder)
+        TextBox1.Text = String.Empty
+    End Sub
+End Class
+
+
+  </textarea>
+</aside>
+</body>
+
+<style type="text/css">
+nav ul ul {
+  display: none;
+}
+
+  nav ul li:hover > ul {
+    display: block;
+  }
+nav ul {
+  background: #efefef; 
+  background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);  
+  background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%); 
+  background: -webkit-linear-gradient(top, #efefef 0%,#bbbbbb 100%); 
+  box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+  padding: 0 20px;
+  border-radius: 10px;  
+  list-style: none;
+  position: relative;
+  display: inline-table;
+}
+  nav ul:after {
+    content: ""; clear: both; display: block;
+  }
+nav ul li {
+  float: left;
+}
+  nav ul li:hover {
+    background: #4b545f;
+    background: linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -moz-linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -webkit-linear-gradient(top, #4f5964 0%,#5f6975 40%);
+  }
+    nav ul li:hover a {
+      color: #fff;
+    }
+  
+  nav ul li a {
+    display: block; padding: 25px 40px;
+    color: #757575; text-decoration: none;
+  }
+nav ul ul {
+  background: #5f6975; border-radius: 0px; padding: 0;
+  position: absolute; top: 100%;
+}
+  nav ul ul li {
+    float: none; 
+    border-top: 1px solid #6b727c;
+    border-bottom: 1px solid #575f6a;
+    position: relative;
+  }
+    nav ul ul li a {
+      padding: 15px 40px;
+      color: #fff;
+    } 
+      nav ul ul li a:hover {
+        background: #4b545f;
+      }
+
+nav ul ul ul {
+  position: absolute; left: 100%; top:0;
+}
+ .container-text :before, .container-text:after {
+            content: "";
+            display: table;
+
+         }
+         .container-text:after {
+            clear: both;
+
+         }
+         .container-text {
+            background: #eaeaed;
+            margin-bottom: 24px;
+            *zoom: 1;
+width: 75%;
+          height: 180%;
+         }
+  .container-text, section, aside {
+            border-radius: 6px;
+         }
+         section, aside {
+            background: #2db34a;
+            color: #fff;
+            margin: 1.858736059%;
+            padding: 30px 0;
+            text-align: center;
+         }
+         section{
+          float:left;
+          width: 30%
+         }
+         aside{
+          float: left;
+          width: 80%;
+          height: 83%;
+         }
+</style>
+</html>

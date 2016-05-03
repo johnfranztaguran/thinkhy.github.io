@@ -1,0 +1,276 @@
+<html>
+<head>
+<title>ProgramsHy(Dora_ard)</title>
+<link rel="icon" href="../drow.jpg" type="image/png">
+<meta charset="utf-8">
+
+<nav>
+<ul>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/home.html">HOME</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/profile.html">PROFILE</a></li>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/crew.html">CREW</a></li>
+    <li ><a href="http://johnfranz.blogspot.com/" target="_blank">BLOG</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/team.html">TEAM</a>
+    <ul>
+                <li><a href="#">CpE_Wiz</a></li>
+                 <li><a href="#">chx_gaming</a></li>      
+                  </ul>
+                </li>
+    <li><a href="#">PROJECTS</a>
+    <ul>
+                <li><a href="#">tafficlight</a>
+                <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_traf_image.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">voicecommandCalculator</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_VC_img.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_dora_img.html">images</a></li>
+                    </ul>
+               </li>
+      </ul>
+     </li>
+     
+     <li><a href="#">PROGRAMS</a>
+          <ul>
+                <li><a href="#">TL</a>
+                       <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_TL_ard.html">arduino</a></li>
+                    
+                    </ul>
+                </li>
+                <li><a href="#">VC</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_arduino.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_ard.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                </ul>
+      </li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/comment.html">COMMENTS</a></li>
+  </ul>
+  </nav>
+  </head>
+<body background="../dota_earth.png">
+<br>
+<div class="container container-text">
+<section>"A code in arduino that can interface in any bluetooth devices"</section>
+<aside>
+  <textarea name="textarea" style="width:400px;height:650px;">
+    #include <SoftwareSerial.h>
+#include <Servo.h>
+Servo leftServoMotor;
+Servo rightServoMotor;
+int ledPin = 13;
+String basa;
+int leftServoPin;
+int rightServoPin;
+
+int servoSpeedLeftForward;
+int servoSpeedRightForward;
+
+int servoSpeedLeftBackward;
+int servoSpeedRightBackward;
+
+int servoSpeedLeftStop;
+int servoSpeedRightStop;
+
+void setup() {
+  Serial.begin(9600);
+ pinMode(ledPin, OUTPUT);
+
+leftServoPin = 9;
+rightServoPin = 8;
+
+leftServoMotor.attach(leftServoPin);
+rightServoMotor.attach(rightServoPin);
+
+servoSpeedLeftStop = 1500;
+servoSpeedRightStop = 1500;
+
+servoSpeedLeftForward = servoSpeedLeftStop + 400;
+servoSpeedLeftBackward = servoSpeedLeftStop - 400;
+
+servoSpeedRightForward = servoSpeedRightStop - 400;
+servoSpeedRightBackward = servoSpeedRightStop + 400; 
+ 
+}
+void loop() {
+  while (Serial.available()){
+    delay(3);
+    char c = Serial.read();
+    basa += c;
+  }
+ if (basa.length() >0){
+  Serial.println(basa);
+
+if(basa == "forward"){
+  robotForward();
+}
+if(basa == "backward"){
+  robotBackward();
+}
+if(basa == "left"){
+  robotLeftForward();
+}
+if(basa == "right"){
+  robotRightForward();
+}
+if(basa == "stop"){
+  robotStop();
+}
+  
+  if (basa == "ON"){
+    digitalWrite(ledPin, HIGH);
+  }
+  if (basa == "OFF"){
+    digitalWrite(ledPin, LOW);
+  }
+  basa="";
+ }
+}
+
+void controlLeftWheel(int spd){
+  leftServoMotor.writeMicroseconds(spd);
+}
+void controlRightWheel(int spd){
+  rightServoMotor.writeMicroseconds(spd);
+}
+void robotForward(){
+  leftServoMotor.writeMicroseconds(servoSpeedLeftForward);
+  rightServoMotor.writeMicroseconds(servoSpeedRightForward);
+}
+void robotBackward(){
+  leftServoMotor.writeMicroseconds(servoSpeedLeftBackward);
+  rightServoMotor.writeMicroseconds(servoSpeedRightBackward);
+}
+void robotStop(){
+  leftServoMotor.writeMicroseconds(servoSpeedLeftStop);
+  rightServoMotor.writeMicroseconds(servoSpeedRightStop);
+}
+void robotLeftForward(){
+  leftServoMotor.writeMicroseconds(servoSpeedLeftForward);
+  rightServoMotor.writeMicroseconds(servoSpeedRightBackward);
+}
+
+void robotRightForward(){
+  rightServoMotor.writeMicroseconds(servoSpeedRightForward);
+  leftServoMotor.writeMicroseconds(servoSpeedLeftBackward);
+}
+
+  </textarea>
+</aside>
+</body>
+
+<style type="text/css">
+nav ul ul {
+  display: none;
+}
+
+  nav ul li:hover > ul {
+    display: block;
+  }
+nav ul {
+  background: #efefef; 
+  background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);  
+  background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%); 
+  background: -webkit-linear-gradient(top, #efefef 0%,#bbbbbb 100%); 
+  box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+  padding: 0 20px;
+  border-radius: 10px;  
+  list-style: none;
+  position: relative;
+  display: inline-table;
+}
+  nav ul:after {
+    content: ""; clear: both; display: block;
+  }
+nav ul li {
+  float: left;
+}
+  nav ul li:hover {
+    background: #4b545f;
+    background: linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -moz-linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -webkit-linear-gradient(top, #4f5964 0%,#5f6975 40%);
+  }
+    nav ul li:hover a {
+      color: #fff;
+    }
+  
+  nav ul li a {
+    display: block; padding: 25px 40px;
+    color: #757575; text-decoration: none;
+  }
+nav ul ul {
+  background: #5f6975; border-radius: 0px; padding: 0;
+  position: absolute; top: 100%;
+}
+  nav ul ul li {
+    float: none; 
+    border-top: 1px solid #6b727c;
+    border-bottom: 1px solid #575f6a;
+    position: relative;
+  }
+    nav ul ul li a {
+      padding: 15px 40px;
+      color: #fff;
+    } 
+      nav ul ul li a:hover {
+        background: #4b545f;
+      }
+
+nav ul ul ul {
+  position: absolute; left: 100%; top:0;
+}
+ .container-text :before, .container-text:after {
+            content: "";
+            display: table;
+
+         }
+         .container-text:after {
+            clear: both;
+
+         }
+         .container-text {
+            background: #eaeaed;
+            margin-bottom: 24px;
+            *zoom: 1;
+width: 75%;
+          height: 115%;
+         }
+  .container-text, section, aside {
+            border-radius: 6px;
+         }
+         section, aside {
+            background: #2db34a;
+            color: #fff;
+            margin: 1.858736059%;
+            padding: 30px 0;
+            text-align: center;
+         }
+         section{
+          float:left;
+          width: 30%
+         }
+         aside{
+          float: left;
+          width: 80%;
+          height: 70%;
+         }
+</style>
+</html>

@@ -1,0 +1,427 @@
+<html>
+<head>
+<title>ProgramsHy(Dora_VB)</title>
+<link rel="icon" href="../drow.jpg" type="image/png">
+<meta charset="utf-8">
+
+<nav>
+<ul>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/home.html">HOME</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/profile.html">PROFILE</a></li>
+    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/crew.html">CREW</a></li>
+    <li ><a href="http://johnfranz.blogspot.com/" target="_blank">BLOG</a></li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/team.html">TEAM</a>
+    <ul>
+                <li><a href="#">CpE_Wiz</a></li>
+                 <li><a href="#">chx_gaming</a></li>      
+                  </ul>
+                </li>
+    <li><a href="#">PROJECTS</a>
+    <ul>
+                <li><a href="#">tafficlight</a>
+                <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_traf_image.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">voicecommandCalculator</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_VC_img.html">images</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                       <ul>
+                    <li><a href="#">description</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/proj_dora_img.html">images</a></li>
+                    </ul>
+               </li>
+      </ul>
+     </li>
+     
+     <li><a href="#">PROGRAMS</a>
+          <ul>
+                <li><a href="#">TL</a>
+                       <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_TL_ard.html">arduino</a></li>
+                    
+                    </ul>
+                </li>
+                <li><a href="#">VC</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_arduino.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_VC_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Dora</a>
+                      <ul>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_ard.html">arduino</a></li>
+                    <li><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/prog_Dora_VB.html">VB</a></li>
+                    </ul>
+                </li>
+                </ul>
+      </li>
+    <li ><a href="file:///C:/Users/alex/Desktop/OJT_files/web_fol/comment.html">COMMENTS</a></li>
+  </ul>
+  </nav>
+  </head>
+<body background="../dota_earth.png">
+<br>
+<div class="container container-text">
+<section>A voice command prototype interface by a certain arduino device. Flexible application installed in specific program</section>
+<aside>
+  <textarea name="textarea" style="width:800px;height:1100px;">
+    
+Imports System.IO
+Imports System.IO.Ports
+Imports System.Threading
+Imports System.Speech
+Imports SpeechLib
+Public Class Form1
+
+
+    Private WithEvents objRecoContext As SpeechLib.SpSharedRecoContext = Nothing
+    Private grammar As SpeechLib.ISpeechRecoGrammar = Nothing
+    Private menuRule As SpeechLib.ISpeechGrammarRule = Nothing
+    Private SpFlags As SpeechVoiceSpeakFlags = SpeechVoiceSpeakFlags.SVSFlagsAsync
+    Private Voice As New SpVoice()
+    Private systemActive As Boolean
+    Private Sub enableVoiceCommand()
+        ' Get an instance of RecoContext. 
+        objRecoContext = New SpeechLib.SpSharedRecoContext()
+        ' Assign an eventhandler for the Hypothesis Event.
+        '   objRecoContext.Hypothesis += new _ISpeechRecoContextEvents_HypothesisEventHandler(Hypo_Event);
+        ' Assign an eventhandler for the Recognition Event.
+        ' AddHandler objRecoContext.Recognition, AddressOf Reco_Event
+        'Creating an instance of the grammer object.
+        grammar = objRecoContext.CreateGrammar(0)
+        'Activate the Menu Commands.      
+        menuRule = grammar.Rules.Add("MenuCommands", SpeechRuleAttributes.SRATopLevel Or SpeechRuleAttributes.SRADynamic, 1)
+        Dim PropValue As Object = ""
+        ' instantiate switch on
+        menuRule.InitialState.AddWordTransition(Nothing, "forward", " ", SpeechGrammarWordType.SGLexical, "forward", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "backward", " ", SpeechGrammarWordType.SGLexical, "backward", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "left", " ", SpeechGrammarWordType.SGLexical, "left", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "right", " ", SpeechGrammarWordType.SGLexical, "right", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "ON", " ", SpeechGrammarWordType.SGLexical, "ON", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "OFF", " ", SpeechGrammarWordType.SGLexical, "OFF", 1, PropValue, 1.0F)
+        menuRule.InitialState.AddWordTransition(Nothing, "stop", " ", SpeechGrammarWordType.SGLexical, "stop", 1, PropValue, 1.0F)
+
+        ' validate phrase
+        grammar.Rules.Commit()
+        grammar.CmdSetRuleState("MenuCommands", SpeechRuleState.SGDSActive)
+    End Sub
+
+    Dim buffer As String
+    Delegate Sub myMethodDelegate(ByVal [text] As String)
+    Dim bD1 As New myMethodDelegate(AddressOf process)
+    Dim WithEvents SerialPort As New IO.Ports.SerialPort
+    Private Sub Form1_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
+        If SerialPort.IsOpen() Then
+            SerialPort.Close()
+        End If
+    End Sub
+
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        GetSerialPortNames()
+    End Sub
+
+    Sub GetSerialPortNames()
+        For Each sp As String In My.Computer.Ports.SerialPortNames
+            lstPorts.Items.Add(sp)
+        Next
+    End Sub
+    Sub SendSerialData(ByVal Port As String, ByVal data As String)
+        If (SerialPort.IsOpen) Then
+            SerialPort.Write(data)
+        Else
+            MsgBox("Not connected to Port.")
+        End If
+    End Sub
+    Sub process(ByVal myString As String)
+        buffer = buffer + myString
+        Dim str As String
+        str = buffer
+        If InStr(str, "|") Then
+            Dim words As String() = str.Split(New Char() {"|"})
+            buffer = ""
+            Dim word As String
+            For Each word In words
+                If (word.Length > 0) Then
+                    lstConsole.Items.Add(word)
+                End If
+            Next
+        End If
+    End Sub
+    Private Sub SerialPort_DataReceived(ByVal sender As Object, ByVal e As System.IO.Ports.SerialDataReceivedEventArgs) Handles SerialPort.DataReceived
+        Dim str As String = SerialPort.ReadExisting()
+        Invoke(bD1, str)
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        If lstPorts.SelectedIndex <> -1 Then
+            Try
+                If SerialPort.IsOpen Then
+                    SerialPort.Close()
+                    Button1.Text = "Connect"
+                Else
+                    SerialPort.PortName = lstPorts.SelectedItem.ToString
+                    SerialPort.BaudRate = 9600
+                    SerialPort.DataBits = 8
+                    SerialPort.Parity = Parity.None
+                    SerialPort.StopBits = StopBits.One
+                    SerialPort.Handshake = Handshake.None
+                    SerialPort.Encoding = System.Text.Encoding.Default
+                    SerialPort.Open()
+                    Button1.Text = "Disconnect"
+                End If
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+        Else
+            MsgBox("Please choose a serial port", vbInformation, "Serial Port")
+        End If
+
+    End Sub
+
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "AT")
+        End If
+
+    End Sub
+
+    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "forward")
+        End If
+
+    End Sub
+
+    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "backward")
+        End If
+
+    End Sub
+
+    Private Sub Button6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button6.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "left")
+        End If
+
+    End Sub
+
+    Private Sub Button7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button7.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "right")
+        End If
+
+    End Sub
+
+    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "stop")
+        End If
+
+    End Sub
+
+    Private Sub Button8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button8.Click
+        Application.Exit()
+        If SerialPort.IsOpen Then
+            SerialPort.Close()
+        End If
+
+    End Sub
+
+
+    Private Sub OvalShape1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OvalShape1.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "ON")
+        End If
+    End Sub
+
+    Private Sub OvalShape2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OvalShape2.Click
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "OFF")
+        End If
+    End Sub
+
+    Private Sub one(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "forward")
+        End If
+        If voiceString = "forward" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "forward")
+        End If
+       
+    End Sub
+    Private Sub two(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "backward")
+        End If
+        If voiceString = "backward" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "backward")
+        End If
+    End Sub
+    Private Sub three(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "left")
+        End If
+        If voiceString = "left" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "left")
+        End If
+    End Sub
+    Private Sub four(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "right")
+        End If
+        If voiceString = "right" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "right")
+        End If
+    End Sub
+    Private Sub five(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "ON")
+        End If
+        If voiceString = "ON" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "ON")
+        End If
+    End Sub
+    Private Sub six(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "stop")
+        End If
+        If voiceString = "stop" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "stop")
+        End If
+    End Sub
+    Private Sub seven(ByVal StreamNumber As Integer, ByVal StreamPosition As Object, ByVal RecognitionType As SpeechRecognitionType, ByVal Result As ISpeechRecoResult) Handles objRecoContext.Recognition
+        Dim voiceString As String = Result.PhraseInfo.GetText(0, -1, True)
+        If (lstPorts.SelectedIndex <> -1) Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "OFF")
+        End If
+        If voiceString = "OFF" Then
+            SendSerialData(lstPorts.SelectedItem.ToString, "OFF")
+        End If
+    End Sub
+    
+    Private Sub OvalShape3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OvalShape3.Click
+        enableVoiceCommand()
+        Voice.Speak("yes master", SpFlags)
+    End Sub
+
+    Private Sub Form1_Load_1(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
+End Class
+
+  </textarea>
+</aside>
+</body>
+
+<style type="text/css">
+nav ul ul {
+  display: none;
+}
+
+  nav ul li:hover > ul {
+    display: block;
+  }
+nav ul {
+  background: #efefef; 
+  background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);  
+  background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%); 
+  background: -webkit-linear-gradient(top, #efefef 0%,#bbbbbb 100%); 
+  box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+  padding: 0 20px;
+  border-radius: 10px;  
+  list-style: none;
+  position: relative;
+  display: inline-table;
+}
+  nav ul:after {
+    content: ""; clear: both; display: block;
+  }
+nav ul li {
+  float: left;
+}
+  nav ul li:hover {
+    background: #4b545f;
+    background: linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -moz-linear-gradient(top, #4f5964 0%, #5f6975 40%);
+    background: -webkit-linear-gradient(top, #4f5964 0%,#5f6975 40%);
+  }
+    nav ul li:hover a {
+      color: #fff;
+    }
+  
+  nav ul li a {
+    display: block; padding: 25px 40px;
+    color: #757575; text-decoration: none;
+  }
+nav ul ul {
+  background: #5f6975; border-radius: 0px; padding: 0;
+  position: absolute; top: 100%;
+}
+  nav ul ul li {
+    float: none; 
+    border-top: 1px solid #6b727c;
+    border-bottom: 1px solid #575f6a;
+    position: relative;
+  }
+    nav ul ul li a {
+      padding: 15px 40px;
+      color: #fff;
+    } 
+      nav ul ul li a:hover {
+        background: #4b545f;
+      }
+
+nav ul ul ul {
+  position: absolute; left: 100%; top:0;
+}
+ .container-text :before, .container-text:after {
+            content: "";
+            display: table;
+
+         }
+         .container-text:after {
+            clear: both;
+
+         }
+         .container-text {
+            background: #eaeaed;
+            margin-bottom: 24px;
+            *zoom: 1;
+width: 75%;
+          height: 180%;
+         }
+  .container-text, section, aside {
+            border-radius: 6px;
+         }
+         section, aside {
+            background: #2db34a;
+            color: #fff;
+            margin: 1.858736059%;
+            padding: 30px 0;
+            text-align: center;
+         }
+         section{
+          float:left;
+          width: 30%
+         }
+         aside{
+          float: left;
+          width: 90%;
+          height: 78%;
+         }
+</style>
+</html>
